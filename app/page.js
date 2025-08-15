@@ -14,7 +14,7 @@ export default function Home() {
         </div>
         <p className="mt-4 max-w-xl text-sm md:text-base leading-relaxed">
           From masala chai to tandoori vibes, from cutting chai to elaichi elegance —
-          we've got a cup for every mood and every moment.
+          we&apos; ve got a cup for every mood and every moment.
         </p>
         <div className="mt-6 flex flex-col sm:flex-row gap-4">
           <Link href={"/login"}>

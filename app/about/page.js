@@ -12,7 +12,7 @@ const About = () => {
         </h2>
         <p className="text-lg text-amber-700 max-w-2xl mb-8">
           At <span className="font-semibold">Get Me a Chai</span>, we’re brewing more than tea —
-          we’re brewing connections. Whether you're a creator, a supporter, or
+          we&apos; re brewing connections. Whether you&apos; re a creator, a supporter, or
           simply someone who loves a good cup of chai, this is your place to
           connect, share, and grow.
         </p>
