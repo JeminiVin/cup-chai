@@ -1,0 +1,5 @@
+<img
+                        className="object-cover w-full h-[350px]"
+                        src="https://c10.patreonusercontent.com/4/patreon-media/p/campaign/4842667/452146dcfeb04f38853368f554aadde1/eyJ3IjoxOTIwLCJ3ZSI6MX0%3D/18.gif?token-hash=Mh-B5X0fAjX72C_3Ggf-nQMUUe4b4Os4Y0qll01wqq4%3D&amp;token-time=1756944000"
+                        alt=""
+                    />

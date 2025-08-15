@@ -1,0 +1,154 @@
+"use client"
+
+import React, { useEffect, useState } from 'react'
+import Script from 'next/script'
+import { fetchuser, fetchpayments, initiate } from '@/actions/useractions'
+import { useSession } from 'next-auth/react'
+
+const PaymentPage = ({ username }) => {
+    const [paymentform, setpaymentform] = useState({})
+    //const { data: session} = useSession()
+    const [currentUser, setcurrentUser] = useState({})
+    const [payments, setPayments] = useState([])
+
+    useEffect(() => {
+        getData()
+    }, [])
+
+    const handleChange = (e) => {
+        setpaymentform({ ...paymentform, [e.target.name]: e.target.value })
+        console.log(paymentform)
+    }
+
+    const getData = async () => {
+        let u = await fetchuser(username)
+        setcurrentUser(u)
+        let dbpayments = await fetchpayments(username)
+        setPayments(dbpayments)
+        console.log(u, dbpayments)
+    }
+
+
+    const pay = async (amount) => {
+        try {
+            let a = await initiate(amount, username, paymentform);
+            let orderId = a.id;
+
+            const options = {
+                key: currentUser.razorpayid, // Use NEXT_PUBLIC_ prefix for client-side env variables
+                amount: amount,
+                currency: "INR",
+                name: "Chai High",
+                description: "Elevate your day with every sip – handcrafted chai that warms your soul.",
+                image: "https://example.com/your_logo",
+                order_id: orderId,
+                callback_url: `${process.env.NEXT_PUBLIC_URL}/api/razorpay`,
+                prefill: {
+                    name: paymentform.name || "",
+                    email: paymentform.email || "test@example.com",
+                    contact: paymentform.contact || "9999999999"
+                },
+                notes: {
+                    address: "Razorpay Corporate Office"
+                },
+                theme: {
+                    color: "#3399cc"
+                }
+            };
+
+            const rzp1 = new window.Razorpay(options);
+            rzp1.open();
+        } catch (error) {
+            console.error("Payment error:", error);
+        }
+
+
+
+    }
+    return (
+        <>
+
+            <Script src="https://checkout.razorpay.com/v1/checkout.js" strategy="afterInteractive" />
+
+
+
+
+            <div className="bg-gradient-to-b from-black via-purple-900 to-black min-h-screen">
+                <div className='cover w-full bg-red-500 relative'>
+                    <img
+                        className='object-cover w-full h-[350px]'
+                        src="https://c10.patreonusercontent.com/4/patreon-media/p/campaign/4842667/452146dcfeb04f38853368f554aadde1/eyJ3IjoxOTIwLCJ3ZSI6MX0%3D/18.gif?token-hash=Mh-B5X0fAjX72C_3Ggf-nQMUUe4b4Os4Y0qll01wqq4%3D&amp;token-time=1756944000"
+                        alt=""
+                    />
+                    <div className='absolute -bottom-20 right-[46%] border-black border-2 rounded-full size-l1'>
+                        <img className='rounded-full object-cover' width={120} height={120} src={currentUser.profilepic} />
+                    </div>
+                </div>
+
+                <div className='info flex justify-center items-center pt-32 pb-10 flex-col gap-2 text-white'>
+                    @{username}
+                    <div className='text-slate-400'>
+                        Creating Animated art for VTT's
+                    </div>
+                    <div className='text-slate-400'>
+                        9,719 members . 82 posts . $15,450/release
+                    </div>
+
+                    <div className='payment flex gap-3 w-[80%] mt-10'>
+                        <div className='supporters w-1/2 bg-slate-500 rounded-lg text-white p-10'>
+                            <h2 className='text-lg font-bold text-center my-5'>supporters</h2>
+                            <ul className='mx-5 text-lg'>
+                                {payments.length == 0 && <li>No payments yet</li>}
+                                {payments.map((p, i) => {
+                                    return <li className='my-2 flex gap-2'>
+
+                                        <img width={33} height={22} src='/avatar.gif' alt='user avatar' />
+                                        <span>
+                                            {p.name} donated <span className='font-bold'>{p.amount}</span> {p.message}
+                                        </span>
+                                    </li>
+
+                                })}
+
+                            </ul>
+                        </div>
+                        <div className='makePayment w-1/2 bg-slate-500 rounded-lg text-white p-10'>
+                            <h2 className='text-2xl font-bold my-5'>make a payment</h2>
+                            <div className='flex gap-2 flex-col'>
+                                <div>
+                                    <input onChange={handleChange} value={paymentform.name || ''} type='text' name='name' className='w-full p-3 rounded-lg bg-slate-800' placeholder='enter name' />
+                                </div>
+
+                                <input onChange={handleChange} name='message' value={paymentform.message || ''} type='text' className='w-full p-3 rounded-lg bg-slate-800' placeholder='enter message' />
+
+                                <input onChange={handleChange} name='amount' value={paymentform.amount || ''} type='text' className='w-full p-3 rounded-lg bg-slate-800' placeholder='enter amount' />
+                                <div className='text-center'>
+
+
+                                    <button
+                                        onClick={() => pay(Number.parseInt(paymentform.amount) * 100)}
+                                        type="button"
+                                        className="text-white bg-gradient-to-r from-purple-500 to-pink-500 hover:bg-gradient-to-l focus:ring-4 focus:outline-none focus:ring-purple-200 dark:focus:ring-purple-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center me-2 mb-2"
+                                    >
+                                        Pay
+                                    </button>
+                                </div>
+                            </div>
+                            {/*or choose from these amount*/}
+                            <div className='flex gap-2 mt-5'>
+                                <button className='bg-slate-800 p-3 rounded-lg' onClick={() => pay(1000)}>Pay -₹10</button>
+                                <button className='bg-slate-800 p-3 rounded-lg' onClick={() => pay(2000)}>Pay -₹20</button>
+                                <button className='bg-slate-800 p-3 rounded-lg' onClick={() => pay(3000)}>Pay -₹30</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+        </>
+    )
+}
+
+export default PaymentPage
